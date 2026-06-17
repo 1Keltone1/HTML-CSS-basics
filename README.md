@@ -1,2 +1,15 @@
 # HTML-CSS-basics
-That's a test-repository for upgrading skills of HTML/CSS and Git
+
+> Учебный проект для отработки навыков вёрстки и работы с Git.
+
+## Цели проекта
+- Закрепить навыки семантической вёрстки HTML5.
+- Практиковаться в CSS (Flexbox, Grid, адаптивная верстка).
+- Отработать базовые команды Git и GitHub.
+
+## Bспользуемые технологии
+- HTML5
+- CSS3 (Flexbox, Grid)
+- Git / GitHub
+
+## Структура проекта
