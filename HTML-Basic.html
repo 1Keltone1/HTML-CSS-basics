@@ -6,107 +6,45 @@
     <link rel="stylesheet" href="styles.css">
   </head>
 
-<body>
-  <header id="header">
-    <img id="header-img" src="https://img.icons8.ru/?size=100&id=tXrjX0eC35Mz&format=png&color=000000" alt="sound logo">
-    <h1 class="header-logo">Original Trombones</h1>
-    <nav id="nav-bar">
-      <a class="nav-link" href="#features">Features</a>
-      <a class="nav-link" href="#how_it_works">How It Works</a>
-      <a class="nav-link" href="#pricing">Pricing</a>
+  <body>
+    <nav id="navbar">
+      <a class="nav-link" href="#welcome-section">About</a>
+      <a class="nav-link" href="#project-section">Projects</a>
+      <a class="nav-link" href="#contact-section">Contact</a>
     </nav>
-  </header> 
-  <main>
-    <h2 id="head">Handcrafted, home-made masterpieces</h2>
-    <form 
-      id="form" 
-      action="https://www.freecodecamp.org/email-submit"
-      method="POST">
-      <input name="email" id="email" type="email" placeholder="Enter your email address">
-      <input 
-        id="submit"
-        type="submit" 
-        value="GET STARTED">
-    </form>
+    <main>
+      <section id="welcome-section">
+        <h1>Welcome To My Portfolio Page</h1>
+        <p>I'm Keltone - a web developer</p>
+      </section>
 
-    <section id="features">
-      <div class="feature-1">
-        <img class="feature-icon" src="https://img.icons8.ru/?size=100&id=FlYM1GD1OXq4&format=png&color=000000" alt="medal">
-        <h2 class="name">Premium Materials</h2>
-        <p class="description">Our trombones use the shiniest brass which is sourced locally. This will increase the longevity of your purchase.</p>
-      </div>
+      <section id="project-section">
+        <h2>These are some of my projects</h2>
+        <div class="projects">
 
-      <div class="feature-2">
-        <img class="feature-icon" src="https://img.icons8.ru/?size=100&id=cCYzXtgW3Tgc&format=png&color=000000" alt="fast car">
-        <h2 class="name">Fast Shipping</h2>
-        <p class="description">We make sure you receive your trombone as soon as we have finished making it. We also provide free returns if you are not satisfied.</p>
-      </div>
+          <div class="project-tile">
+            <img src="https://global.discourse-cdn.com/freecodecamp/original/3X/b/2/b25a062ba96cbe05a998bd6d3ac58915415d01db.jpg" alt="Tribute Page">
+            <a target="_blank" href="https://www.freecodecamp.org/">Tribute Page</a>
+          </div>
 
-      <div class="feature-3">
-        <img class="feature-icon" src="https://img.icons8.ru/?size=100&id=16172&format=png&color=000000" alt="shield">
-        <h2 class="name">Quality Assurance</h2>
-        <p class="description">For every purchase you make, we will ensure there are no damages or faults and we will check and test the pitch of your instrument.</p>
-      </div>
-    </section>
-    <section id="how_it_works">
-      <iframe 
-        id="video" 
-        width="560" 
-        height="315" 
-        src="https://www.youtube-nocookie.com/embed/y8Yv4pnO7qc"
-        title="YouTube video player" 
-        frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-        referrerpolicy="strict-origin-when-cross-origin" 
-        allowfullscreen>
-      </iframe>
-    </section>
-    <section id="pricing">
-      <div id="tenor">
-        <h3>Tenor Trombone</h3>
-        <h4 class="price">$600</h4>
-        <p>
-          Good for beginners
-          Excellent sound quality
-          Great for Jazz Bands
-          Nice and shiny
-        </p>
-        <button class="select-1 select">SELECT</button>
-      </div>
+          <div class="project-tile">
+            <img src="https://i.ytimg.com/vi/T7R6I6EGtUU/maxresdefault.jpg" alt="Product Landing Page">
+            <a target="_blank" href="https://www.freecodecamp.org/">Product Landing Page</a>
+          </div>
 
-      <div id="bass">
-        <h3>Bass Trombone</h3>
-        <h4 class="price">$900</h4>
-        <p>
-          Sound quality is unmatched
-          Best for professionals
-          Absolutely stunning
-          Durable and long lasting
-        </p>
-        <button class="select-2 select">SELECT</button>
-      </div>
-
-      <div id="valve">
-        <h3>Valve Trombone</h3>
-        <h4 class="price">$1200</h4>
-        <p>
-          Plays similar to a Trumpet
-          Great for Jazz Bands
-          Beautiful in sound and appearance
-          Just amazing
-        </p>
-        <button class="select-3 select">SELECT</button>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <div class="links">
-      <a href="">Privacy</a>
-      <a href="">Terms</a>
-      <a href="">Contact</a>
-    </div>
-    <p class="copyright">Copyright 2016, Original Trombones</p>
-  </footer>
-</body>
-
+        </div>
+      </section>
+      <section id="contact-section">
+        <h2>Let's work together</h2>
+        <div class="links">
+          <a class="link" id="profile-link" href="https://github.com/1Keltone1"  target="_blank">GitHub</a>
+          <a class="link" href="https://www.freecodecamp.org/Keltone" target="_blank">freeCodeCamp</a>
+        </div>
+      </section>
+    </main>
+    <hr />
+    <footer>
+      <p>**This is just a fake portfolio. All the projects given are not real</p>
+    </footer>
+  </body>
 </html>
