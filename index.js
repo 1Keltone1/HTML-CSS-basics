@@ -1,82 +1,175 @@
-const options = ["Rock", "Paper", "Scissors"];
-
-function getRandomComputerResult() {
-  const randomIndex = Math.floor(Math.random() * options.length);
-  return options[randomIndex];
+const footballTeam = {
+  team: "Spain",
+  year: 2026,
+  headCoach: "Luis de la Fuente",
+  players: [
+    {
+      name: "David Raya",
+      position: "goalkeeper",
+      isCaptain: false
+    },
+    {
+      name: "Joan Garcia",
+      position: "goalkeeper",
+      isCaptain: false
+    },
+    {
+      name: "Unai Simon",
+      position: "goalkeeper",
+      isCaptain: true
+    }, 
+    {
+      name: "Marc Pubill",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Alex Grimaldo",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Eric Garcia",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Marcos Llorente",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Pedro Porro",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Pau Cubarsi",
+      position: "defender",
+      isCaptain: false
+    }, 
+    {
+      name: "Mikel Merino",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Fabian Ruiz",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Gavi",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Alex Baena",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Rodri",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Martin Zubimendi",
+      position: "midfielder",
+      isCaptain: false
+    }, 
+    {
+      name: "Ferran Torres",
+      position: "forward",
+      isCaptain: false
+    }, 
+    {
+      name: "Dani Olmo",
+      position: "forward",
+      isCaptain: false
+    }, 
+    {
+      name: "Yeremy Pino",
+      position: "forward",
+      isCaptain: false
+    }, 
+    {
+      name: "Nico Williams",
+      position: "forward",
+      isCaptain: false
+    }, 
+    {
+      name: "Lamine Yamal",
+      position: "forward",
+      isCaptain: false
+    }, 
+    {
+      name: "Mikel Oyarzabal",
+      position: "forward",
+      isCaptain: false
+    }
+  ]
 }
 
-function hasPlayerWonTheRound(playerChoice, computerChoice) {
-  return (
-    (playerChoice === "Rock" && computerChoice === "Scissors") ||
-    (playerChoice === "Scissors" && computerChoice === "Paper") ||
-    (playerChoice === "Paper" && computerChoice === "Rock")
-  );
-}
+const coach = document.getElementById("head-coach");
+const team = document.getElementById("team");
+const year = document.getElementById("year");
 
-let playerScore = 0;
-let computerScore = 0;
+coach.textContent = footballTeam.headCoach;
+team.textContent = footballTeam.team;
+year.textContent = footballTeam.year;
 
-function getRoundResults(userOption) {
-  const computerResult = getRandomComputerResult();
-
-  if (hasPlayerWonTheRound(userOption, computerResult)) {
-    playerScore++;
-    return `Player wins! ${userOption} beats ${computerResult}`;
-  } else if (computerResult === userOption) {
-    return `It's a tie! Both chose ${userOption}`;
+const strings = [];
+for (const player of footballTeam.players) {
+  if (player.isCaptain) {
+    strings.push(
+      `<div class="player-card">
+        <h2>${player.name}(Captain)</h2>
+        <p>Position:${player.position}
+      </div>`
+    );
   } else {
-    computerScore++;
-    return `Computer wins! ${computerResult} beats ${userOption}`;
+    strings.push(
+      `<div class="player-card">
+        <h2>${player.name}</h2>
+        <p>Position:${player.position}
+      </div>`
+    );
   }
 }
 
-let playerScoreSpanElement = document.getElementById("player-score");
-let computerScoreSpanElement = document.getElementById("computer-score");
-let roundResultsMsg = document.getElementById("results-msg");
-let winnerMsgElement = document.getElementById("winner-msg");
-let optionsContainer = document.querySelector(".options-container");
-let resetGameBtn = document.getElementById("reset-game-btn");
+const container = document.getElementById("player-cards");
+container.innerHTML = strings.join("\n");
 
-function showResults(userOption) {
-  roundResultsMsg.innerText = getRoundResults(userOption);
-  computerScoreSpanElement.innerText = computerScore;
-  playerScoreSpanElement.innerText = playerScore;
+const selector = document.getElementById("players");
+selector.addEventListener("change", () => {
+  showPlayers(selector.value);
+})
 
-  if (playerScore === 3 || computerScore === 3) {
-    winnerMsgElement.innerText = `${
-      playerScore === 3 ? "Player" : "Computer"
-    } has won the game!`;
-
-    resetGameBtn.style.display = "block";
-    optionsContainer.style.display = "none";
+function showPlayers(option) {
+  if (option === "all") {
+    container.innerHTML = strings.join("\n");
+  } else {
+    const result = [];
+    for (const player of footballTeam.players) {
+      if (player.position === option) {
+        if (player.isCaptain) {
+          result.push(
+            `<div class="player-card">
+              <h2>${player.name}(Captain)</h2>
+              <p>Position:${player.position}
+            </div>`
+          );
+        } else {
+          result.push(
+            `<div class="player-card">
+              <h2>${player.name}</h2>
+              <p>Position:${player.position}
+            </div>`
+          );
+        }
+      }
+    }
+    container.innerHTML = result.join("\n");
   }
-};
-
-function resetGame() {
-  playerScore = 0;
-  computerScore = 0;
-  playerScoreSpanElement.textContent = playerScore;
-  computerScoreSpanElement.textContent = computerScore;
-  resetGameBtn.style.display = "none";
-  optionsContainer.style.display = "block";
-  winnerMsgElement.textContent = "";
-  roundResultsMsg.textContent = "";
 }
-
-resetGameBtn.addEventListener("click", resetGame);
-
-const rockBtn = document.getElementById("rock-btn");
-const paperBtn = document.getElementById("paper-btn");
-const scissorsBtn = document.getElementById("scissors-btn");
-
-rockBtn.addEventListener("click", function () {
-  showResults("Rock");
-});
-
-paperBtn.addEventListener("click", function () {
-  showResults("Paper");
-});
-
-scissorsBtn.addEventListener("click", function () {
-  showResults("Scissors");
-});
