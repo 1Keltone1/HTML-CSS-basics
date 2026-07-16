@@ -1,55 +1,22 @@
-const themes = [
-  {
-    name: "light",
-    message: "Here comes the sun!"
-  },
-  {
-    name: "dark",
-    message: "Dark necessities are part of my design..."
-  }
-];
+const btn = document.getElementById("check-btn");
+const input = document.getElementById("text-input");
+const regex = /[^a-zA-Z0-9]/g;
+const result = document.getElementById("result");
 
-let isExpanded = false;
-const list = document.getElementById("theme-dropdown");
-const btn = document.getElementById("theme-switcher-button");
-const note = document.getElementById("switch-note");
-const pageBody = document.querySelector("body");
-
-function showList() {
-  list.hidden = !list.hidden;
-  isExpanded = !isExpanded;
-  btn.setAttribute("aria-expanded", isExpanded);
-  if (isExpanded){
-    list.style.display = "flex";
+function showResult() {
+  if (input.value === "") {
+    alert("Please input a value");
   } else {
-    list.style.display = "none";
-  }
-}
-
-btn.addEventListener("click", () => {
-  showList();
-})
-
-function choseTheme(theme) {
-  const msg = themes.find(item => item.name === theme).message;
-  showList();
-  note.innerHTML = `<p>${msg}</p>`;
-  if (theme === "light") {
-    pageBody.classList.add("light");
-    if (pageBody.classList.contains("dark")) {
-      pageBody.classList.remove("dark");
-    }
-  } else {
-    pageBody.classList.add("dark");
-    if (pageBody.classList.contains("light")) {
-      pageBody.classList.remove("light");
+    const str = input.value.toLowerCase().replace(regex, "");
+    const reversed = str.split("").reverse().join("");
+    if (str === reversed) {
+      result.textContent = `${input.value} is a palindrome`;
+      result.style.display = "flex";
+    } else {
+      result.textContent = `${input.value} is not a palindrome`;
+      result.style.display = "flex";
     }
   }
 }
 
-const options = document.querySelectorAll('[role="menuitem"]');
-options.forEach((option) => {
-  option.addEventListener("click", () => {
-    choseTheme(option.textContent);
-  })
-});
+btn.addEventListener("click", showResult);
