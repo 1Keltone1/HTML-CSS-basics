@@ -1,53 +1,34 @@
-const regexPattern = document.getElementById("pattern");
-const stringToTest = document.getElementById("test-string");
-const testButton = document.getElementById("test-btn");
-const testResult = document.getElementById("result");
-const caseInsensitiveFlag = document.getElementById("i");
-const globalFlag = document.getElementById("g");
+console.log('Скрипт загружен!');
 
-function getFlags() {
-  let result = '';
-  if (caseInsensitiveFlag.checked) {
-    result += 'i';
-  }
-  if (globalFlag.checked) {
-    result += 'g';
-  }
-  return result;
+const markdown = document.getElementById("markdown-input");
+const raw = document.getElementById("html-output");
+const preview = document.getElementById("preview");
+const h3Regex = /^\s{0,}### (.*)/gm;
+const h2Regex = /^\s{0,}## (.*)/gm;
+const h1Regex = /^\s{0,}# (.*)/gm;
+const boldRegex = /\*\*(.*)\*\*|__(.*)__/g;
+const emRegex = /\*(.*)\*|_(.*)_/g;
+const imgRegex = /!\[(?<alt>.*?)\]\((?<link>.*?)\)/g;
+const linkRegex = /\[(?<text>.*?)\]\((?<url>.*?)\)/g;
+const quoteRegex = /^\s{0,}> (.*)/gm;
+
+console.log('markdown:', markdown);
+console.log('raw:', raw);
+console.log('preview:', preview);
+
+function convertMarkdown() {
+    let result = markdown.value.slice();
+    result = result.replaceAll(h3Regex, `<h3>$1</h3>`).replaceAll(h2Regex, `<h2>$1</h2>`).replaceAll(h1Regex, `<h1>$1</h1>`);
+    result = result.replaceAll(boldRegex, `<strong>$1$2</strong>`);   
+    result = result.replaceAll(emRegex, `<em>$1$2</em>`);
+    result = result.replaceAll(imgRegex, `<img alt="$<alt>" src="$<link>">`);
+    result = result.replaceAll(linkRegex, `<a href="$<url>">$<text></a>`);
+    result = result.replaceAll(quoteRegex, `<blockquote>$1</blockquote>`);
+
+    return result;
 }
 
-
-function regexMatch() {
-  const regex = new RegExp(regexPattern.value, getFlags());
-  let testString = stringToTest.textContent;
-  let funcResult = ''
-  
-  if (regex.global) {
-    const resultArr = Array.from(testString.matchAll(regex));
-    if (resultArr.length > 0) {
-      testString = testString.replaceAll(regex, `<span class="highlight">$&</span>`);
-      const func = [];
-      for (const el of resultArr) {
-        if (typeof el[0] === 'string') {
-          func.push(el[0]);
-        }
-      }
-      funcResult = func.join(", ");
-      stringToTest.innerHTML = testString;
-      testResult.textContent = funcResult;
-    }
-  } else {
-    const resultArr = testString.match(regex);
-    if (resultArr !== null) {
-      testString = testString.replace(regex, `<span class="highlight">$&</span>`);
-      funcResult = resultArr[0];
-    }
-    stringToTest.innerHTML = testString;
-    testResult.textContent = funcResult;
-  }
-  if (testResult.textContent === '') {
-    testResult.textContent = "no match";
-  }
-}
-
-testButton.addEventListener("click", regexMatch);
+markdown.addEventListener("input", () => {
+    raw.textContent = convertMarkdown();
+    preview.innerHTML = convertMarkdown();
+})

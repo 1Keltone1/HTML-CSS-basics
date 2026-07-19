@@ -4,41 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown to HTML Converter</title>
     <link rel="stylesheet" href="styles.css">
-    <title>Regex Sandbox</title>
-
 </head>
 
 <body>
-    <h1>Regex Sandbox</h1>
-    <main>
-        <div id="regex-container">
-            <label for="pattern">Regex Pattern:
-                <div id="pattern-container">/<input type="text" id="pattern" name="pattern"
-                        placeholder="Enter your regex pattern">/</div>
-            </label>
-            <div id="flags-container">
-                <p>Flags: </p>
-                <label for="i">
-                    <input type="checkbox" name="flags" id="i"> i
-                </label>
-                <label for="g">
-                    <input type="checkbox" name="flags" id="g"> g
-                </label>
-            </div>
+    <h1>Markdown to HTML Converter</h1>
+    <div id="container">
+        <div class="container">
+            <h2>Markdown Input:</h2>
+            <textarea id="markdown-input" placeholder="Enter your markdown here..."></textarea>
         </div>
-        <div id="test-container">
-            <p>Test String:</p>
-            <div id="test-string" placeholder="Enter your test string" contenteditable="true"></div>
+        <div class="container">
+            <h2>Raw HTML Output:</h2>
+            <div id="html-output"></div>
         </div>
-        <button class="btn" id="test-btn" type="button">Test Regex</button>
-        <div id="result-container">
-            <h2>Result:</h2>
-            <p id="result">
-            </p>
+        <div class="container">
+            <h2>HTML Preview:</h2>
+            <div id="preview"></div>
         </div>
-
-    </main>
+    </div>
     <script src="index.js"></script>
 </body>
 
