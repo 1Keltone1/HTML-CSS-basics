@@ -1,128 +1,155 @@
-const taskForm = document.getElementById("task-form");
-const confirmCloseDialog = document.getElementById("confirm-close-dialog");
-const openTaskFormBtn = document.getElementById("open-task-form-btn");
-const closeTaskFormBtn = document.getElementById("close-task-form-btn");
-const addOrUpdateTaskBtn = document.getElementById("add-or-update-task-btn");
-const cancelBtn = document.getElementById("cancel-btn");
-const discardBtn = document.getElementById("discard-btn");
-const tasksContainer = document.getElementById("tasks-container");
-const titleInput = document.getElementById("title-input");
-const dateInput = document.getElementById("date-input");
-const descriptionInput = document.getElementById("description-input");
-
-const taskData = JSON.parse(localStorage.getItem("data")) || [];
-let currentTask = {};
-
-const removeSpecialChars = (val) => {
-  return val.trim().replace(/[^A-Za-z0-9\-\s]/g, '')
+function getBookmarks() {
+  try {
+    const data = localStorage.getItem("bookmarks");
+    
+    if (!data) {
+      return [];
+    }
+    
+    const parsed = JSON.parse(data);
+    
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    
+    const isValid = parsed.every(item => {
+      return (
+        item !== null &&
+        typeof item === 'object' &&
+        typeof item.name === 'string' &&
+        typeof item.category === 'string' &&
+        typeof item.url === 'string' &&
+        item.name.trim() !== '' &&
+        item.category.trim() !== '' &&
+        item.url.trim() !== ''
+      );
+    });
+    
+    if (!isValid) {
+      return [];
+    }
+    
+    return parsed;
+    
+  } catch (error) {
+    return [];
+  }
 }
 
-const addOrUpdateTask = () => {
-   if(!titleInput.value.trim()){
-    alert("Please provide a title");
+const main = document.getElementById("main-section");
+const form = document.getElementById("form-section");
+const addBtn = document.getElementById("add-bookmark-button");
+const categoryName = document.querySelector("#form-section .category-name");
+const selectCategory = document.getElementById("category-dropdown");
+const closeBtn = document.getElementById("close-form-button");
+const addBtnForm = document.getElementById("add-bookmark-button-form");
+const nameInput = document.getElementById("name");
+const urlInput = document.getElementById("url");
+const listSection = document.getElementById("bookmark-list-section");
+const list = document.getElementById("category-list");
+const viewBtn = document.getElementById("view-category-button");
+const closeListBtn = document.getElementById("close-list-button");
+const deleteBtn = document.getElementById("delete-bookmark-button");
+
+function displayOrCloseForm() {
+  main.classList.toggle("hidden");
+  form.classList.toggle("hidden");
+}
+
+addBtn.addEventListener("click", () => {
+  const category = selectCategory.value;
+  categoryName.innerText = category.slice(0,1).toUpperCase() + category.slice(1);
+  displayOrCloseForm();
+})
+
+closeBtn.addEventListener("click", displayOrCloseForm);
+
+addBtnForm.addEventListener("click", () => {
+  const name = nameInput.value;
+  const ctgry = selectCategory.value;
+  const url = urlInput.value;
+  const arr = getBookmarks();
+  arr.push({name: name, category: ctgry, url: url});
+  localStorage.setItem("bookmarks", JSON.stringify(arr));
+  nameInput.value = "";
+  urlInput.value = "";
+  displayOrCloseForm();
+});
+
+function displayOrHideCategory() {
+  main.classList.toggle("hidden");
+  listSection.classList.toggle("hidden");
+};
+
+viewBtn.addEventListener("click", () => {
+  const category = selectCategory.value;
+  document.querySelector("#bookmark-list-section .category-name").innerText = category.slice(0,1).toUpperCase() + category.slice(1);
+  const arr = getBookmarks();
+  const ctgrArr = [];
+  displayOrHideCategory();
+  for (const mark of arr) {
+    if (mark.category === selectCategory.value) {
+      ctgrArr.push(mark);
+    }
+  }
+  if (ctgrArr.length === 0) {
+    list.innerHTML = `<p>No Bookmarks Found</p>`;
+  } else {
+    let htmlString = ``;
+    for (const mark of ctgrArr) {
+      htmlString += `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="radio" name="radio-group" id="${mark.name}" value="${mark.name}">
+          <label for="${mark.name}"><a href="${mark.url}">${mark.name}</a></label>
+        </div>
+        `;
+    }
+    list.innerHTML = htmlString;
+  }
+});
+
+closeListBtn.addEventListener("click", () => {
+  displayOrHideCategory();
+});
+
+deleteBtn.addEventListener("click", () => {
+  const arr = getBookmarks();
+  const marks = document.querySelectorAll("input[name='radio-group']");
+  let nameToDelete = "";
+  for (const mark of marks) {
+    if (mark.checked) {
+      nameToDelete = mark.value;
+      break;
+    }
+  }
+  if (nameToDelete === "") {
     return;
   }
-  const dataArrIndex = taskData.findIndex((item) => item.id === currentTask.id);
-  const taskObj = {
-    id: `${removeSpecialChars(titleInput.value).toLowerCase().split(" ").join("-")}-${Date.now()}`,
-    title: titleInput.value,
-    date: dateInput.value,
-    description: descriptionInput.value,
-  };
-
-  if (dataArrIndex === -1) {
-    taskData.unshift(taskObj);
+  
+  const categoryHeader = document.querySelector("#bookmark-list-section .category-name");
+  const currentCategory = categoryHeader.innerText.toLowerCase();
+  
+  const newArr = arr.filter(mark => {
+    return !(mark.name === nameToDelete && mark.category === currentCategory);
+  });
+  
+  localStorage.setItem("bookmarks", JSON.stringify(newArr));
+  
+  const updatedArr = getBookmarks();
+  const ctgrArr = updatedArr.filter(mark => mark.category === currentCategory);
+  
+  if (ctgrArr.length === 0) {
+    list.innerHTML = `<p>No Bookmarks Found</p>`;
   } else {
-    taskData[dataArrIndex] = taskObj;
-  }
-
-  localStorage.setItem("data", JSON.stringify(taskData));
-  updateTaskContainer()
-  reset()
-};
-
-const updateTaskContainer = () => {
-  tasksContainer.innerHTML = "";
-
-  taskData.forEach(
-    ({ id, title, date, description }) => {
-        (tasksContainer.innerHTML += `
-        <div class="task" id="${id}">
-          <p><strong>Title:</strong> ${title}</p>
-          <p><strong>Date:</strong> ${date}</p>
-          <p><strong>Description:</strong> ${description}</p>
-          <button onclick="editTask(this)" type="button" class="btn">Edit</button>
-          <button onclick="deleteTask(this)" type="button" class="btn">Delete</button> 
-        </div>
-      `)
+    let htmlString = "";
+    for (const mark of ctgrArr) {
+        htmlString += `
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="radio" name="radio-group" id="${mark.name}" value="${mark.name}">
+            <label for="${mark.name}"><a href="${mark.url}">${mark.name}</a></label>
+          </div>
+          `;
     }
-  );
-};
-
-
-const deleteTask = (buttonEl) => {
-  const dataArrIndex = taskData.findIndex(
-    (item) => item.id === buttonEl.parentElement.id
-  );
-
-  buttonEl.parentElement.remove();
-  taskData.splice(dataArrIndex, 1);
-  localStorage.setItem("data", JSON.stringify(taskData));
-}
-
-const editTask = (buttonEl) => {
-    const dataArrIndex = taskData.findIndex(
-    (item) => item.id === buttonEl.parentElement.id
-  );
-
-  currentTask = taskData[dataArrIndex];
-
-  titleInput.value = currentTask.title;
-  dateInput.value = currentTask.date;
-  descriptionInput.value = currentTask.description;
-
-  addOrUpdateTaskBtn.innerText = "Update Task";
-
-  taskForm.classList.toggle("hidden");  
-}
-
-const reset = () => {
-  addOrUpdateTaskBtn.innerText = "Add Task";
-  titleInput.value = "";
-  dateInput.value = "";
-  descriptionInput.value = "";
-  taskForm.classList.toggle("hidden");
-  currentTask = {};
-}
-
-if (taskData.length) {
-  updateTaskContainer();
-}
-
-openTaskFormBtn.addEventListener("click", () =>
-  taskForm.classList.toggle("hidden")
-);
-
-closeTaskFormBtn.addEventListener("click", () => {
-  const formInputsContainValues = titleInput.value || dateInput.value || descriptionInput.value;
-  const formInputValuesUpdated = titleInput.value !== currentTask.title || dateInput.value !== currentTask.date || descriptionInput.value !== currentTask.description;
-
-  if (formInputsContainValues && formInputValuesUpdated) {
-    confirmCloseDialog.showModal();
-  } else {
-    reset();
+    list.innerHTML = htmlString;
   }
-});
-
-cancelBtn.addEventListener("click", () => confirmCloseDialog.close());
-
-discardBtn.addEventListener("click", () => {
-  confirmCloseDialog.close();
-  reset()
-});
-
-taskForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-
-  addOrUpdateTask();
 });
