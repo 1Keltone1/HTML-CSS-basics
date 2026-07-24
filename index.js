@@ -1,155 +1,144 @@
-function getBookmarks() {
-  try {
-    const data = localStorage.getItem("bookmarks");
-    
-    if (!data) {
-      return [];
-    }
-    
-    const parsed = JSON.parse(data);
-    
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-    
-    const isValid = parsed.every(item => {
-      return (
-        item !== null &&
-        typeof item === 'object' &&
-        typeof item.name === 'string' &&
-        typeof item.category === 'string' &&
-        typeof item.url === 'string' &&
-        item.name.trim() !== '' &&
-        item.category.trim() !== '' &&
-        item.url.trim() !== ''
-      );
-    });
-    
-    if (!isValid) {
-      return [];
-    }
-    
-    return parsed;
-    
-  } catch (error) {
-    return [];
+const cartContainer = document.getElementById("cart-container");
+const productsContainer = document.getElementById("products-container");
+const dessertCards = document.getElementById("dessert-card-container");
+const cartBtn = document.getElementById("cart-btn");
+const clearCartBtn = document.getElementById("clear-cart-btn");
+const totalNumberOfItems = document.getElementById("total-items");
+const cartSubTotal = document.getElementById("subtotal");
+const cartTaxes = document.getElementById("taxes");
+const cartTotal = document.getElementById("total");
+const showHideCartSpan = document.getElementById("show-hide-cart");
+let isCartShowing = false;
+
+class Dessert {
+  constructor(id, name, price, category) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.category = category;
   }
 }
 
-const main = document.getElementById("main-section");
-const form = document.getElementById("form-section");
-const addBtn = document.getElementById("add-bookmark-button");
-const categoryName = document.querySelector("#form-section .category-name");
-const selectCategory = document.getElementById("category-dropdown");
-const closeBtn = document.getElementById("close-form-button");
-const addBtnForm = document.getElementById("add-bookmark-button-form");
-const nameInput = document.getElementById("name");
-const urlInput = document.getElementById("url");
-const listSection = document.getElementById("bookmark-list-section");
-const list = document.getElementById("category-list");
-const viewBtn = document.getElementById("view-category-button");
-const closeListBtn = document.getElementById("close-list-button");
-const deleteBtn = document.getElementById("delete-bookmark-button");
+const products = [
+  new Dessert(1, "Vanilla Cupcakes (6 Pack)", 12.99, "Cupcake"),
+  new Dessert(2, "French Macaron", 3.99, "Macaron"),
+  new Dessert(3, "Pumpkin Cupcake", 3.99, "Cupcake"),
+  new Dessert(4, "Chocolate Cupcake", 5.99, "Cupcake"),
+  new Dessert(5, "Chocolate Pretzels (4 Pack)", 10.99, "Pretzel"),
+  new Dessert(6, "Strawberry Ice Cream", 2.99, "Ice Cream"),
+  new Dessert(7, "Chocolate Macarons (4 Pack)", 9.99, "Macaron"),
+  new Dessert(8, "Strawberry Pretzel", 4.99, "Pretzel"),
+  new Dessert(9, "Butter Pecan Ice Cream", 2.99, "Ice Cream"),
+  new Dessert(10, "Rocky Road Ice Cream", 2.99, "Ice Cream"),
+  new Dessert(11, "Vanilla Macarons (5 Pack)", 11.99, "Macaron"),
+  new Dessert(12, "Lemon Cupcakes (4 Pack)", 12.99, "Cupcake"),
+];
 
-function displayOrCloseForm() {
-  main.classList.toggle("hidden");
-  form.classList.toggle("hidden");
-}
+products.forEach(
+  ({ name, id, price, category }) => {
+    dessertCards.innerHTML += `
+      <div class="dessert-card">
+        <h2>${name}</h2>
+        <p class="dessert-price">$${price}</p>
+        <p class="product-category">Category: ${category}</p>
+        <button 
+          id="${id}" 
+          class="btn add-to-cart-btn">Add to cart
+        </button>
+      </div>
+    `;
+  }
+);
 
-addBtn.addEventListener("click", () => {
-  const category = selectCategory.value;
-  categoryName.innerText = category.slice(0,1).toUpperCase() + category.slice(1);
-  displayOrCloseForm();
-})
+class ShoppingCart {
+  constructor() {
+    this.items = [];
+    this.total = 0;
+    this.taxRate = 8.25;
+  }
 
-closeBtn.addEventListener("click", displayOrCloseForm);
+  addItem(id, products) {
+    const product = products.find((item) => item.id === id);
+    const { name, price } = product;
+    this.items.push(product);
 
-addBtnForm.addEventListener("click", () => {
-  const name = nameInput.value;
-  const ctgry = selectCategory.value;
-  const url = urlInput.value;
-  const arr = getBookmarks();
-  arr.push({name: name, category: ctgry, url: url});
-  localStorage.setItem("bookmarks", JSON.stringify(arr));
-  nameInput.value = "";
-  urlInput.value = "";
-  displayOrCloseForm();
-});
+    const totalCountPerProduct = {};
+    this.items.forEach((dessert) => {
+      totalCountPerProduct[dessert.id] = (totalCountPerProduct[dessert.id] || 0) + 1;
+    });
 
-function displayOrHideCategory() {
-  main.classList.toggle("hidden");
-  listSection.classList.toggle("hidden");
+    const currentProductCount = totalCountPerProduct[product.id];
+    const currentProductCountSpan = document.getElementById(`product-count-for-id${id}`);
+
+    currentProductCount > 1 
+      ? currentProductCountSpan.textContent = `${currentProductCount}x`
+      : productsContainer.innerHTML += `
+      <div id="dessert${id}" class="product">
+        <p>
+          <span class="product-count" id="product-count-for-id${id}"></span>${name}
+        </p>
+        <p>${price}</p>
+      </div>
+      `;
+  }
+
+  getCounts() {
+    return this.items.length;
+  }
+
+  clearCart() {
+    if (!this.items.length) {
+      alert("Your shopping cart is already empty");
+      return;
+    }
+
+    const isCartCleared = confirm(
+      "Are you sure you want to clear all items from your shopping cart?"
+    );
+
+    if (isCartCleared) {
+      this.items = [];
+      this.total = 0;
+      productsContainer.innerHTML = "";
+      totalNumberOfItems.textContent = 0;
+      cartSubTotal.textContent = 0;
+      cartTaxes.textContent = 0;
+      cartTotal.textContent = 0;
+    }
+  }
+
+  calculateTaxes(amount) {
+    return parseFloat(((this.taxRate / 100) * amount).toFixed(2));
+  }
+
+  calculateTotal() {
+    const subTotal = this.items.reduce((total, item) => total + item.price, 0);
+    const tax = this.calculateTaxes(subTotal);
+    this.total = subTotal + tax;
+    cartSubTotal.textContent = `$${subTotal.toFixed(2)}`;
+    cartTaxes.textContent = `$${tax.toFixed(2)}`;
+    cartTotal.textContent = `$${this.total.toFixed(2)}`;
+    return this.total;
+  }
 };
 
-viewBtn.addEventListener("click", () => {
-  const category = selectCategory.value;
-  document.querySelector("#bookmark-list-section .category-name").innerText = category.slice(0,1).toUpperCase() + category.slice(1);
-  const arr = getBookmarks();
-  const ctgrArr = [];
-  displayOrHideCategory();
-  for (const mark of arr) {
-    if (mark.category === selectCategory.value) {
-      ctgrArr.push(mark);
-    }
+const cart = new ShoppingCart();
+const addToCartBtns = document.getElementsByClassName("add-to-cart-btn");
+
+[...addToCartBtns].forEach(
+  (btn) => {
+    btn.addEventListener("click", (event) => {
+      cart.addItem(Number(event.target.id), products);
+      totalNumberOfItems.textContent = cart.getCounts();
+      cart.calculateTotal();
+    });
   }
-  if (ctgrArr.length === 0) {
-    list.innerHTML = `<p>No Bookmarks Found</p>`;
-  } else {
-    let htmlString = ``;
-    for (const mark of ctgrArr) {
-      htmlString += `
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <input type="radio" name="radio-group" id="${mark.name}" value="${mark.name}">
-          <label for="${mark.name}"><a href="${mark.url}">${mark.name}</a></label>
-        </div>
-        `;
-    }
-    list.innerHTML = htmlString;
-  }
+);
+
+cartBtn.addEventListener("click", () => {
+  isCartShowing = !isCartShowing;
+  showHideCartSpan.textContent = isCartShowing ? "Hide" : "Show";
+  cartContainer.style.display = isCartShowing ? "block" : "none";
 });
 
-closeListBtn.addEventListener("click", () => {
-  displayOrHideCategory();
-});
-
-deleteBtn.addEventListener("click", () => {
-  const arr = getBookmarks();
-  const marks = document.querySelectorAll("input[name='radio-group']");
-  let nameToDelete = "";
-  for (const mark of marks) {
-    if (mark.checked) {
-      nameToDelete = mark.value;
-      break;
-    }
-  }
-  if (nameToDelete === "") {
-    return;
-  }
-  
-  const categoryHeader = document.querySelector("#bookmark-list-section .category-name");
-  const currentCategory = categoryHeader.innerText.toLowerCase();
-  
-  const newArr = arr.filter(mark => {
-    return !(mark.name === nameToDelete && mark.category === currentCategory);
-  });
-  
-  localStorage.setItem("bookmarks", JSON.stringify(newArr));
-  
-  const updatedArr = getBookmarks();
-  const ctgrArr = updatedArr.filter(mark => mark.category === currentCategory);
-  
-  if (ctgrArr.length === 0) {
-    list.innerHTML = `<p>No Bookmarks Found</p>`;
-  } else {
-    let htmlString = "";
-    for (const mark of ctgrArr) {
-        htmlString += `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <input type="radio" name="radio-group" id="${mark.name}" value="${mark.name}">
-            <label for="${mark.name}"><a href="${mark.url}">${mark.name}</a></label>
-          </div>
-          `;
-    }
-    list.innerHTML = htmlString;
-  }
-});
+clearCartBtn.addEventListener("click", cart.clearCart.bind(cart));
