@@ -1,144 +1,86 @@
-const cartContainer = document.getElementById("cart-container");
-const productsContainer = document.getElementById("products-container");
-const dessertCards = document.getElementById("dessert-card-container");
-const cartBtn = document.getElementById("cart-btn");
-const clearCartBtn = document.getElementById("clear-cart-btn");
-const totalNumberOfItems = document.getElementById("total-items");
-const cartSubTotal = document.getElementById("subtotal");
-const cartTaxes = document.getElementById("taxes");
-const cartTotal = document.getElementById("total");
-const showHideCartSpan = document.getElementById("show-hide-cart");
-let isCartShowing = false;
-
-class Dessert {
-  constructor(id, name, price, category) {
-    this.id = id;
-    this.name = name;
-    this.price = price;
-    this.category = category;
+const numberInput = document.getElementById("number-input");
+const convertBtn = document.getElementById("convert-btn");
+const result = document.getElementById("result");
+const animationContainer = document.getElementById("animation-container");
+const animationData = [
+  {
+    inputVal: 5,
+    addElDelay: 1000,
+    msg: 'decimalToBinary(5) returns "10" + 1 (5 % 2). Then it pops off the stack.',
+    showMsgDelay: 15000,
+    removeElDelay: 20000,
+  },
+  {
+    inputVal: 2,
+    addElDelay: 1500,
+    msg: 'decimalToBinary(2) returns "1" + 0 (2 % 2) and gives that value to the stack below. Then it pops off the stack.',
+    showMsgDelay: 10000,
+    removeElDelay: 15000,
+  },
+  {
+    inputVal: 1,
+    addElDelay: 2000,
+    msg: "decimalToBinary(1) returns '1' (base case) and gives that value to the stack below. Then it pops off the stack.",
+    showMsgDelay: 5000,
+    removeElDelay: 10000,
   }
-}
-
-const products = [
-  new Dessert(1, "Vanilla Cupcakes (6 Pack)", 12.99, "Cupcake"),
-  new Dessert(2, "French Macaron", 3.99, "Macaron"),
-  new Dessert(3, "Pumpkin Cupcake", 3.99, "Cupcake"),
-  new Dessert(4, "Chocolate Cupcake", 5.99, "Cupcake"),
-  new Dessert(5, "Chocolate Pretzels (4 Pack)", 10.99, "Pretzel"),
-  new Dessert(6, "Strawberry Ice Cream", 2.99, "Ice Cream"),
-  new Dessert(7, "Chocolate Macarons (4 Pack)", 9.99, "Macaron"),
-  new Dessert(8, "Strawberry Pretzel", 4.99, "Pretzel"),
-  new Dessert(9, "Butter Pecan Ice Cream", 2.99, "Ice Cream"),
-  new Dessert(10, "Rocky Road Ice Cream", 2.99, "Ice Cream"),
-  new Dessert(11, "Vanilla Macarons (5 Pack)", 11.99, "Macaron"),
-  new Dessert(12, "Lemon Cupcakes (4 Pack)", 12.99, "Cupcake"),
 ];
 
-products.forEach(
-  ({ name, id, price, category }) => {
-    dessertCards.innerHTML += `
-      <div class="dessert-card">
-        <h2>${name}</h2>
-        <p class="dessert-price">$${price}</p>
-        <p class="product-category">Category: ${category}</p>
-        <button 
-          id="${id}" 
-          class="btn add-to-cart-btn">Add to cart
-        </button>
-      </div>
-    `;
-  }
-);
-
-class ShoppingCart {
-  constructor() {
-    this.items = [];
-    this.total = 0;
-    this.taxRate = 8.25;
-  }
-
-  addItem(id, products) {
-    const product = products.find((item) => item.id === id);
-    const { name, price } = product;
-    this.items.push(product);
-
-    const totalCountPerProduct = {};
-    this.items.forEach((dessert) => {
-      totalCountPerProduct[dessert.id] = (totalCountPerProduct[dessert.id] || 0) + 1;
-    });
-
-    const currentProductCount = totalCountPerProduct[product.id];
-    const currentProductCountSpan = document.getElementById(`product-count-for-id${id}`);
-
-    currentProductCount > 1 
-      ? currentProductCountSpan.textContent = `${currentProductCount}x`
-      : productsContainer.innerHTML += `
-      <div id="dessert${id}" class="product">
-        <p>
-          <span class="product-count" id="product-count-for-id${id}"></span>${name}
-        </p>
-        <p>${price}</p>
-      </div>
-      `;
-  }
-
-  getCounts() {
-    return this.items.length;
-  }
-
-  clearCart() {
-    if (!this.items.length) {
-      alert("Your shopping cart is already empty");
-      return;
-    }
-
-    const isCartCleared = confirm(
-      "Are you sure you want to clear all items from your shopping cart?"
-    );
-
-    if (isCartCleared) {
-      this.items = [];
-      this.total = 0;
-      productsContainer.innerHTML = "";
-      totalNumberOfItems.textContent = 0;
-      cartSubTotal.textContent = 0;
-      cartTaxes.textContent = 0;
-      cartTotal.textContent = 0;
-    }
-  }
-
-  calculateTaxes(amount) {
-    return parseFloat(((this.taxRate / 100) * amount).toFixed(2));
-  }
-
-  calculateTotal() {
-    const subTotal = this.items.reduce((total, item) => total + item.price, 0);
-    const tax = this.calculateTaxes(subTotal);
-    this.total = subTotal + tax;
-    cartSubTotal.textContent = `$${subTotal.toFixed(2)}`;
-    cartTaxes.textContent = `$${tax.toFixed(2)}`;
-    cartTotal.textContent = `$${this.total.toFixed(2)}`;
-    return this.total;
+const decimalToBinary = (input) => {
+  if (input === 0 || input === 1) {
+    return String(input);
+  } else {
+    return decimalToBinary(Math.floor(input / 2)) + (input % 2);
   }
 };
 
-const cart = new ShoppingCart();
-const addToCartBtns = document.getElementsByClassName("add-to-cart-btn");
+const showAnimation = () => {
+  result.innerText = "Call Stack Animation";
 
-[...addToCartBtns].forEach(
-  (btn) => {
-    btn.addEventListener("click", (event) => {
-      cart.addItem(Number(event.target.id), products);
-      totalNumberOfItems.textContent = cart.getCounts();
-      cart.calculateTotal();
-    });
+  animationData.forEach((obj) => {
+    setTimeout(() => {
+      animationContainer.innerHTML += `
+        <p id="${obj.inputVal}" class="animation-frame">
+          decimalToBinary(${obj.inputVal})
+        </p>
+      `;
+    }, obj.addElDelay);
+
+    setTimeout(() => {
+      document.getElementById(obj.inputVal).textContent = obj.msg;
+    }, obj.showMsgDelay);
+
+    setTimeout(() => {
+      document.getElementById(obj.inputVal).remove();
+    }, obj.removeElDelay);
+  });
+
+  setTimeout(() => {
+    result.textContent = decimalToBinary(5);
+  }, 20000);
+};
+
+const checkUserInput = () => {
+  const inputInt = parseInt(numberInput.value);
+
+  if (!numberInput.value || isNaN(inputInt) || inputInt < 0) {
+    alert("Please provide a decimal number greater than or equal to 0");
+    return;
   }
-);
 
-cartBtn.addEventListener("click", () => {
-  isCartShowing = !isCartShowing;
-  showHideCartSpan.textContent = isCartShowing ? "Hide" : "Show";
-  cartContainer.style.display = isCartShowing ? "block" : "none";
+  if (inputInt === 5) {
+    showAnimation();
+    return;
+  }
+
+  result.textContent = decimalToBinary(inputInt);
+  numberInput.value = "";
+};
+
+convertBtn.addEventListener("click", checkUserInput);
+
+numberInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    checkUserInput();
+  }
 });
-
-clearCartBtn.addEventListener("click", cart.clearCart.bind(cart));
