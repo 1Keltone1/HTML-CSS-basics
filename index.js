@@ -1,50 +1,83 @@
-const conversionTable = {
-  cup: { gram: 240, ounce: 8.0, teaspoon: 48 },
-  gram: { cup: 1 / 240, ounce: 0.0353, teaspoon: 0.2 },
-  ounce: { cup: 0.125, gram: 28.35, teaspoon: 6 },
-  teaspoon: { cup: 1 / 48, gram: 5, ounce: 0.167 },
+function generateElement() {
+  return Math.floor(Math.random() * (100)) + 1;
 }
 
-const convertQuantity = (fromUnit) => (toUnit) => (quantity) => {
-  const conversionRate = conversionTable[fromUnit][toUnit];
-  return quantity * conversionRate;
+function generateArray() {
+  const arr = [];
+  for (let i = 0; i < 5; i++) {
+    arr.push(generateElement());
+  }
+  return arr;
 }
 
-const gramsResult = convertQuantity("cup")("gram")(2);
-console.log(gramsResult);
+function generateContainer() {
+  return document.createElement('div');
+}
 
-const adjustForServings = (baseQuantity) => (newServings) =>
-  baseQuantity * newServings;
+function fillArrContainer(el, arr) {
+  el.innerHTML = `<span>${arr[0]}</span><span>${arr[1]}</span><span>${arr[2]}</span><span>${arr[3]}</span><span>${arr[4]}</span>`
+}
 
-const servingsResult = adjustForServings(4)(6);
-console.log(servingsResult);
+function isOrdered(a, b) {
+  return a <= b;
+}
 
-const processIngredient = (baseQuantity, baseUnit, newUnit, newServings) => {
-  const adjustedQuantity = adjustForServings(baseQuantity)(newServings);
-  const convertedQuantity =
-    convertQuantity(baseUnit)(newUnit)(adjustedQuantity);
-  return convertedQuantity.toFixed(2);
-};
-
-const ingredientName = document.getElementById("ingredient");
-const ingredientQuantity = document.getElementById("quantity");
-const unitToConvert = document.getElementById("unit");
-const numberOfServings = document.getElementById("servings");
-const recipeForm = document.getElementById("recipe-form");
-const resultList = document.getElementById("result-list");
-
-const units = ["cup", "gram", "ounce", "teaspoon"];
-
-const updateResultsList = () => {
-  resultList.innerHTML = "";
-  for (let unit of units) {
-    if (unitToConvert.value !== unit) {
-      resultList.innerHTML += `<li>${ingredientName.value}: ${processIngredient(ingredientQuantity.value, unitToConvert.value, unit, numberOfServings.value)} ${unit}</li>`;
-    }
+function swapElements(arr, indx) {
+  if (!isOrdered(arr[indx], arr[indx + 1])) {
+    const temp = arr[indx];
+    arr[indx] = arr[indx + 1];
+    arr[indx + 1] = temp;
   }
 }
 
-recipeForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  updateResultsList();
-});
+function highlightCurrentEls(el, indx) {
+  const elements = el.children;
+  if (elements[indx] && elements[indx + 1]) {
+    elements[indx].style.border = "2px dashed red";
+    elements[indx + 1].style.border = "2px dashed red";
+  }
+}
+
+const generateBtn = document.getElementById("generate-btn");
+const startArr = document.getElementById("starting-array");
+const sortBtn = document.getElementById("sort-btn");
+const arrContainer = document.getElementById("array-container");
+let array = [];
+sortBtn.style.display = "none";
+
+generateBtn.addEventListener("click", () => {
+  //array = generateArray();
+  array = [56, 92, 61, 6, 27];
+  fillArrContainer(startArr, array);
+  arrContainer.innerHTML = '';
+  arrContainer.appendChild(startArr);
+  sortBtn.style.display = "flex";
+})
+
+sortBtn.addEventListener("click", () => {
+  sortBtn.style.display = "none";
+  highlightCurrentEls(startArr, 0);
+
+  for (let i = 0; i < array.length - 1; i++) {
+    let wasSwapped = false;
+    for (let j = 0; j < array.length - 1; j++) {    
+      const newDiv = generateContainer();
+      fillArrContainer(newDiv, array);
+      highlightCurrentEls(newDiv, j);
+      arrContainer.appendChild(newDiv);
+      if (!isOrdered(array[j], array[j + 1])) {
+        swapElements(array, j);
+        wasSwapped = true;
+      }
+    }
+    if (!wasSwapped) {
+      break;
+    }
+  }
+  const finalDiv = generateContainer();
+  fillArrContainer(finalDiv, array);
+  finalDiv.style.border = "4px solid green";
+  arrContainer.appendChild(finalDiv);
+  const childToDelete = arrContainer.children[1];
+  arrContainer.removeChild(childToDelete);
+})
