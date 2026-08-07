@@ -1,114 +1,114 @@
-const forumLatest = 'https://cdn.freecodecamp.org/curriculum/forum-latest/latest.json';
-const forumTopicUrl = 'https://forum.freecodecamp.org/t/';
-const forumCategoryUrl = 'https://forum.freecodecamp.org/c/';
-const avatarUrl = 'https://cdn.freecodecamp.org/curriculum/forum-latest';
+const shuffledFragments = [
+  { id: 15, text: "and, after a time, passed the place where the Hare was sleeping." },
+  { id: 12, text: "he lay down beside the course to take a nap" },
+  ,
+  { id: 11, text: "and to make the Tortoise feel very deeply how ridiculous it was for him to try a race with a Hare," },
+  { id: 7, text: "but for the fun of the thing he agreed." },
+  { id: 19, text: "The Hare now ran his swiftest," },
+  ,
+  { id: 1, text: "A Hare was making fun of the Tortoise one day for being so slow." },
+  { id: 14, text: "The Tortoise meanwhile kept going slowly but steadily," },
+  { id: 9, text: "marked the distance and started the runners off." },
+  ,
+  { id: 5, text: "I'll run you a race and prove it.\"" },
+  { id: 17, text: "and when at last he did wake up," },
+  { id: 2, text: '"Do you ever get anywhere?" he asked with a mocking laugh.' },
+  { id: 12, text: "he lay down beside the course to take a nap" },
+  ,
+  { id: 8, text: "So the Fox, who had consented to act as judge," },
+  { id: 20, text: "but he could not overtake the Tortoise in time." },
+  { id: 5, text: "I'll run you a race and prove it.\"" },
+  { id: 6, text: "The Hare was much amused at the idea of running a race with the Tortoise," },
+  ,
+  { id: 13, text: "until the Tortoise should catch up." },
+  { id: 10, text: "The Hare was soon far out of sight," },
+  { id: 12, text: "he lay down beside the course to take a nap" },
+  { id: 18, text: "the Tortoise was near the goal." },
+];
 
-const allCategories = {
-  299: { category: 'Career Advice', className: 'career' },
-  409: { category: 'Project Feedback', className: 'feedback' },
-  417: { category: 'freeCodeCamp Support', className: 'support' },
-  421: { category: 'JavaScript', className: 'javascript' },
-  423: { category: 'HTML - CSS', className: 'html-css' },
-  424: { category: 'Python', className: 'python' },
-  432: { category: 'You Can Do This!', className: 'motivation' },
-  560: { category: 'Back-End Development', className: 'backend' }
-};
-
-function timeAgo(timestamp) {
-  const currentTime = new Date().getTime();
-  const givenTime = new Date(timestamp).getTime();
-  const diff = currentTime - givenTime;
-  if (diff < 3600000) {
-    return `${Math.floor(diff / 60000)}m ago`;
+function compactFragments(arr) {
+  let isCompact = false;
+  let result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] !== undefined) {
+      result.push(arr[i]);
+    } else {
+      isCompact = true;
+    }
   }
-  if (diff < 86400000) {
-    return `${Math.floor(diff / 3600000)}h ago`;
-  } 
-  return `${Math.floor(diff / 86400000)}d ago`;
-}
-
-function viewCount(number) {
-  if (number >= 1000) {
-    return `${Math.floor(number / 1000)}k`;
+  if (isCompact) {
+    console.log("[COMPACTED]");
   }
-  return number;
-}
-
-function forumCategory(id) {
-  if (allCategories.hasOwnProperty(id)) {
-    const result = `<a class="category ${allCategories[id]["className"]}" href="${forumCategoryUrl}${allCategories[id]["className"]}/${id}">${allCategories[id]["category"]}</a>`;
-    return result;
-  }
-  const result = `<a class="category general" href="${forumCategoryUrl}general/${id}">General</a>`;
   return result;
 }
 
+const compactedShuffledFragments = compactFragments(shuffledFragments);
 
-function avatars(posters, users) {
-  let htmlString = ``;
-  for (let i = 0; i < posters.length; i++) {
-    let user = null;
-    for (let j = 0; j < users.length; j++) {
-      if (users[j].id === posters[i]["user_id"]) {
-        user = users[j];
-        break
+function sortFragments(arr) {
+  let result = [...arr.slice()];
+  for (let i = 0; i < result.length - 1; i++) {
+    for (let j = 0; j < result.length - i - 1; j++) {
+      if (result[j].id > result[j + 1].id) {
+        const temp = result[j];
+        result[j] = result[j + 1];
+        result[j + 1] = temp;
       }
     }
-    if (user){
-      let avatar_template = user["avatar_template"].replace("{size}", "30");
-      let imgTag = '';
-      if (user["avatar_template"][0] === "/") {
-        imgTag = `<img src="${avatarUrl}${avatar_template}" alt="${user.name}">`
-      } else {
-        imgTag = `<img src="${avatar_template}" alt="${user.name}">`
-      }
-      htmlString += imgTag;
+  }
+  return result;
+}
+
+const sortedFragments = sortFragments(compactedShuffledFragments);
+
+function dedupeFragments(arr) {
+  let ids = [];
+  let result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (!ids.includes(arr[i].id)) {
+      ids.push(arr[i].id);
+      result.push(arr[i]);
+    } else {
+      console.log(`[DEDUPED] ${arr[i].id}`)
     }
   }
-  return htmlString;
+  return result;
 }
 
-const tableBody = document.getElementById("posts-container");
+const dedupedFragments = dedupeFragments(sortedFragments);
 
-function showLatestPosts(data) {
-  const users = data.users;
-  const topics = data["topic_list"].topics;
-  let result = ``;
-  for (let i = 0; i < topics.length; i++) {
-    let tableRow = `
-      <tr>
-        <td>
-          <a class="post-title" href="${forumTopicUrl}${topics[i].slug}/${topics[i].id}">${topics[i].title}</a>
-          ${forumCategory(topics[i]["category_id"])} 
-        </td>
-        <td>
-          <div class="avatar-container">
-            ${avatars(topics[i].posters, users)}
-          </div>
-        </td>
-        <td>
-          ${topics[i]["posts_count"] - 1}
-        </td>
-        <td>
-          ${viewCount(topics[i].views)}
-        </td>
-        <td>
-          ${timeAgo(topics[i]["bumped_at"])}
-        </td>
-      </tr>`
-    result += tableRow;
+function fillMissingFragments(arr) {
+  let result = [];
+  let nextId = 1;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id == nextId) {
+      result.push(arr[i]);
+      nextId++;
+    } else {
+      if (i < arr.length) {
+        for (let k = nextId; k < arr[i].id; k++) {
+          result.push({id: k, text: "[...]"});
+          nextId++;
+          console.log(`[FILLED] ${k}`);
+        }
+      }
+    }
   }
-  tableBody.innerHTML = result;
-}
-
-async function fetchData() {
-  try {
-    let response = await fetch(forumLatest);
-    let data = await response.json();
-    showLatestPosts(data);
-  } catch(error) {
-    console.log(error);
+  if (result[result.length - 1].id != arr[arr.length - 1].id) {
+    result.push(arr[arr.length - 1]);
   }
+  return result;
 }
 
-fetchData();
+const filledFragments = fillMissingFragments(dedupedFragments);
+
+function assembleStory(arr) {
+  let result = '';
+  for (let i = 0; i < arr.length; i++) {
+    result += arr[i].text + "\n";
+  }
+  return result.slice(0, -1);
+}
+
+console.log(assembleStory(filledFragments));
+console.log(JSON.stringify(fillMissingFragments([{ id: 1, text: "a" }, { id: 3, text: "c" }])));
+console.log(assembleStory([{ id: 1, text: "Hello" }, { id: 2, text: "World" }]));
