@@ -1,114 +1,111 @@
-const shuffledFragments = [
-  { id: 15, text: "and, after a time, passed the place where the Hare was sleeping." },
-  { id: 12, text: "he lay down beside the course to take a nap" },
-  ,
-  { id: 11, text: "and to make the Tortoise feel very deeply how ridiculous it was for him to try a race with a Hare," },
-  { id: 7, text: "but for the fun of the thing he agreed." },
-  { id: 19, text: "The Hare now ran his swiftest," },
-  ,
-  { id: 1, text: "A Hare was making fun of the Tortoise one day for being so slow." },
-  { id: 14, text: "The Tortoise meanwhile kept going slowly but steadily," },
-  { id: 9, text: "marked the distance and started the runners off." },
-  ,
-  { id: 5, text: "I'll run you a race and prove it.\"" },
-  { id: 17, text: "and when at last he did wake up," },
-  { id: 2, text: '"Do you ever get anywhere?" he asked with a mocking laugh.' },
-  { id: 12, text: "he lay down beside the course to take a nap" },
-  ,
-  { id: 8, text: "So the Fox, who had consented to act as judge," },
-  { id: 20, text: "but he could not overtake the Tortoise in time." },
-  { id: 5, text: "I'll run you a race and prove it.\"" },
-  { id: 6, text: "The Hare was much amused at the idea of running a race with the Tortoise," },
-  ,
-  { id: 13, text: "until the Tortoise should catch up." },
-  { id: 10, text: "The Hare was soon far out of sight," },
-  { id: 12, text: "he lay down beside the course to take a nap" },
-  { id: 18, text: "the Tortoise was near the goal." },
-];
+const budgetForm = document.getElementById('budget-form');
+const incomeInput = document.getElementById("income");
+const rentInput = document.getElementById("rent-amount");
+const entryDropdown = document.getElementById("entry-dropdown");
+const addEntryButton = document.getElementById('add-entry');
+const clearButton = document.getElementById('clear');
+const output = document.getElementById('output');
+let isError = false;
 
-function compactFragments(arr) {
-  let isCompact = false;
-  let result = [];
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] !== undefined) {
-      result.push(arr[i]);
-    } else {
-      isCompact = true;
+function cleanInputString(str) {
+  const regex = /[+-\s]/g;
+  return str.replace(regex, '');
+}
+
+function isInvalidInput(str) {
+  const regex = /\d+e\d+/i;
+  return str.match(regex);
+}
+
+function addEntry() {
+  const category = entryDropdown.value;
+  const targetInputContainer = document.querySelector(`#${category} .input-container`);
+  const entryNumber = targetInputContainer.querySelectorAll('input[type="text"]').length + 1;
+  const HTMLString = `
+  <label for="${category}-${entryNumber}-name">Expense ${entryNumber} Name</label>
+  <input type="text" id="${category}-${entryNumber}-name" placeholder="Name" />
+  <label for="${category}-${entryNumber}-amount">Expense ${entryNumber} Amount</label>
+  <input 
+    type="number" 
+    min="0" 
+    id="${category}-${entryNumber}-amount" placeholder="Amount" 
+    />`;
+    targetInputContainer.insertAdjacentHTML('beforeend', HTMLString);
+}
+
+function calculateBudget(e) {
+  e.preventDefault();
+  isError = false;
+
+  const foodInputs = document.querySelectorAll("#food input[type='number']");
+  const utilitiesInputs = document.querySelectorAll("#utilities input[type='number']");
+  const entertainmentInputs = document.querySelectorAll("#entertainment input[type='number']");
+
+  const rent = getTotalFromInputs([rentInput]);
+  const food = getTotalFromInputs(foodInputs);
+  const utilities = getTotalFromInputs(utilitiesInputs);
+  const entertainment = getTotalFromInputs(entertainmentInputs);
+  const income = getTotalFromInputs([incomeInput]);
+
+  if (isError) {
+    return;
+  }
+
+  const expenses = rent + food + utilities + entertainment;
+  const netRemaining = income - expenses;
+
+  let statusText = "";
+  let statusClass = "";
+  
+  if (netRemaining < 0) {
+    statusText = `Over Budget by $${Math.abs(netRemaining)}`;
+    statusClass = "deficit";
+  } else {
+    statusText = `$${netRemaining} Remaining`;
+    statusClass = "surplus";
+  }
+
+  output.innerHTML = `
+    <span class="${statusClass}">${statusText}</span>
+    <hr>
+    <p>$${income} Total Income</p>
+    <p>$${expenses} Total Expenses</p>
+  `;
+
+  output.classList.remove("hide");
+
+}
+
+function getTotalFromInputs(list) {
+  let total = 0;
+
+  for (const item of list) {
+    const currVal = cleanInputString(item.value);
+    const invalidInputMatch = isInvalidInput(currVal);
+
+    if (invalidInputMatch) {
+      alert(`Invalid Input: ${invalidInputMatch[0]}`);
+      isError = true;
+      return null;
     }
+    total += Number(currVal);
   }
-  if (isCompact) {
-    console.log("[COMPACTED]");
-  }
-  return result;
+  return total;
 }
 
-const compactedShuffledFragments = compactFragments(shuffledFragments);
+function clearForm() {  
+  const inputContainers = Array.from(document.querySelectorAll('.input-container'));  
 
-function sortFragments(arr) {
-  let result = [...arr.slice()];
-  for (let i = 0; i < result.length - 1; i++) {
-    for (let j = 0; j < result.length - i - 1; j++) {
-      if (result[j].id > result[j + 1].id) {
-        const temp = result[j];
-        result[j] = result[j + 1];
-        result[j + 1] = temp;
-      }
-    }
-  }
-  return result;
+  for (const container of inputContainers) {  
+    container.innerHTML = '';  
+  }  
+
+  incomeInput.value = '';  
+  rentInput.value = '';  
+  output.innerText = '';  
+  output.classList.add('hide');  
 }
 
-const sortedFragments = sortFragments(compactedShuffledFragments);
-
-function dedupeFragments(arr) {
-  let ids = [];
-  let result = [];
-  for (let i = 0; i < arr.length; i++) {
-    if (!ids.includes(arr[i].id)) {
-      ids.push(arr[i].id);
-      result.push(arr[i]);
-    } else {
-      console.log(`[DEDUPED] ${arr[i].id}`)
-    }
-  }
-  return result;
-}
-
-const dedupedFragments = dedupeFragments(sortedFragments);
-
-function fillMissingFragments(arr) {
-  let result = [];
-  let nextId = 1;
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i].id == nextId) {
-      result.push(arr[i]);
-      nextId++;
-    } else {
-      if (i < arr.length) {
-        for (let k = nextId; k < arr[i].id; k++) {
-          result.push({id: k, text: "[...]"});
-          nextId++;
-          console.log(`[FILLED] ${k}`);
-        }
-      }
-    }
-  }
-  if (result[result.length - 1].id != arr[arr.length - 1].id) {
-    result.push(arr[arr.length - 1]);
-  }
-  return result;
-}
-
-const filledFragments = fillMissingFragments(dedupedFragments);
-
-function assembleStory(arr) {
-  let result = '';
-  for (let i = 0; i < arr.length; i++) {
-    result += arr[i].text + "\n";
-  }
-  return result.slice(0, -1);
-}
-
-console.log(assembleStory(filledFragments));
-console.log(JSON.stringify(fillMissingFragments([{ id: 1, text: "a" }, { id: 3, text: "c" }])));
-console.log(assembleStory([{ id: 1, text: "Hello" }, { id: 2, text: "World" }]));
+addEntryButton.addEventListener("click", addEntry);
+budgetForm.addEventListener("submit", calculateBudget);
+clearButton.addEventListener("click", clearForm);
