@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-size: 1.4rem;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#select-container {
+    margin-top: 8vh;
+    display: flex;
+    flex-direction: row;
+    padding: 0 20% 0 15%;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    align-self: center;
+    height: 10vh;
+}
+
+#select-location {
+    width: 30%;
+    border-radius: 24px;
+    font-size: 1.4rem;
+    text-align: center;
+    border: 4px solid orange;
+}
+
+#select-location:hover, #select-location:active {
+    cursor: pointer;
+}
+
+#get-weather-btn {
+    width: 30%;
+    border-radius: 24px;
+    font-size: 1.4rem;
+    text-align: center;
+    border: 4px solid orange;
+    background-color: white;
+}
+
+#get-weather-btn:hover {
+    background-color: #f8e27f;
+    cursor: pointer;
+}
+
+#get-weather-btn:active {
+    background-color: #ffba3a;
+    cursor: pointer;
+}
+
+#container {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    padding-left: 30px;
+    grid-template-areas: 
+        'temp feels'
+        'humid type'
+        'wind gust'
+        'location icon';
+    margin: 1rem;
+    gap: 2rem;
+    width: 90vw;
+}
+
+#main-temperature {
+    grid-area: temp;
+}
+
+#feels-like {
+    grid-area: feels;
+}
+
+#humidity {
+    grid-area: humid;
+}
+
+#wind {
+    grid-area: wind;
+
+}
+
+#wind-gust {
+    grid-area: gust;
+
+}
+
+#weather-main {
+    grid-area: type;
+
+}
+
+#weather-icon {
+    grid-area: icon;
+    align-self: center;
+    margin-left: 40%;
+}
+
+#location {
+    grid-area: location;
+    width: 100%;
+}
+
+#main-temperature, #feels-like, #humidity, #wind, #wind-gust, #weather-main, #location {
+    border-radius: 24px;
+    height: 11vh;
+    padding-left: 20px;
+    border: 4px solid gold;
+    width: 80%;
+}
+
+@media (max-width: 1030px) {
+    #container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+        'temp' 
+        'feels'
+        'humid' 
+        'type'
+        'wind' 
+        'gust'
+        'location' 
+        'icon';
+    }
+    #select-location {
+        font-size: 1rem;
+        width: 50%;
+    }
+    #get-weather-btn {
+        font-size: 1rem;
+        width: 40%;
+    }
+}
